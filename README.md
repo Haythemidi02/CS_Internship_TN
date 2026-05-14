@@ -136,10 +136,3 @@ The frontend communicates with the backend API. Ensure the backend server is run
 
 The `uploads/` directory in the backend stores uploaded files. Ensure proper permissions are set for this directory.
 
-## License
-
-This project is part of the CS Internship program.
-
-## Support
-
-For questions or issues, please reach out to the project maintainers.
