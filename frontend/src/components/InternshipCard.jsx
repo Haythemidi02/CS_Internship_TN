@@ -1,5 +1,4 @@
-import React from 'react';
-import { Star, MapPin, Briefcase, Mail, Heart, Check, Trash2 } from 'lucide-react';
+import { Star, MapPin, Mail, Heart, Check, Sparkles, Globe, Building } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 function InternshipCard({
@@ -19,7 +18,8 @@ function InternshipCard({
 
   const highlightText = (text, term) => {
     if (!term || !text) return text;
-    const regex = new RegExp(`(${term})`, 'gi');
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedTerm})`, 'gi');
     const parts = String(text).split(regex);
     return parts.map((part, i) =>
       regex.test(part) ? <mark key={i}>{part}</mark> : part
@@ -27,6 +27,15 @@ function InternshipCard({
   };
 
   const specialties = parseSpecialties(internship.specialties);
+
+  // Get priority color class
+  const getPriorityClass = (priority) => {
+    if (!priority) return '';
+    if (priority.toLowerCase().includes('a') || priority.toLowerCase().includes('top')) return 'priority-high';
+    if (priority.toLowerCase().includes('b') || priority.toLowerCase().includes('high')) return 'priority-medium';
+    if (priority.toLowerCase().includes('c') || priority.toLowerCase().includes('medium')) return 'priority-normal';
+    return 'priority-low';
+  };
 
   return (
     <motion.div
@@ -36,6 +45,14 @@ function InternshipCard({
       whileHover={{ y: -5 }}
       transition={{ duration: 0.2 }}
     >
+      {/* CV Match Score */}
+      {internship.cv_match && (
+        <div className="card-cv-match">
+          <Sparkles size={12} />
+          <span>{internship.cv_match.score}% match</span>
+        </div>
+      )}
+
       <div className="card-header">
         <div className="card-select">
           <input
@@ -68,10 +85,35 @@ function InternshipCard({
         {highlightText(internship.subject || internship.tailored_angle || 'No details provided.', searchTerm)}
       </p>
 
-      {internship.address && (
+      {/* Location Info */}
+      <div className="card-location-row">
+        {(internship.country || internship.city || internship.governorate) && (
+          <div className="location-info">
+            <Globe size={12} />
+            <span className="location-country">{internship.country}</span>
+            {internship.city && <span className="location-sep">-</span>}
+            {internship.city && <span className="location-city">{internship.city}</span>}
+          </div>
+        )}
+        {internship.company_type && (
+          <div className="company-type-badge">
+            <Building size={12} />
+            <span>{internship.company_type}</span>
+          </div>
+        )}
+      </div>
+
+      {internship.address && !internship.city && (
         <div className="card-location">
           <MapPin size={14} />
           <span>{internship.address}</span>
+        </div>
+      )}
+
+      {/* Priority Badge */}
+      {internship.priority && (
+        <div className={`priority-indicator ${getPriorityClass(internship.priority)}`}>
+          {internship.priority}
         </div>
       )}
 

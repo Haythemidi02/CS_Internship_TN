@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Trash2, FileText, CheckCircle, Clock, XCircle, Filter, Search, Edit2, Save, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { ApplicationStats } from '../components/StatsCard';
 
@@ -46,7 +45,7 @@ function MyApplications() {
       } else {
         toast.error("Failed to delete record.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Network error.");
     }
   };
@@ -66,7 +65,7 @@ function MyApplications() {
       } else {
         toast.error("Failed to update.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Network error.");
     }
   };

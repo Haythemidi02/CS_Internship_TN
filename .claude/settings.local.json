@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import pandas as pd; df = pd.read_excel\\('summer_internship.xlsx'\\); print\\('Columns:'\\); print\\(df.columns.tolist\\(\\)\\); print\\('\\\\nSample data:'\\); print\\(df.head\\(3\\).to_string\\(\\)\\)\")",
+      "Bash(python -c \"import pandas as pd; df = pd.read_excel\\('summer_internship.xlsx'\\); print\\('Sample specialties:'\\); specs = df['Sp\\\\xc3\\\\xa9cialit\\\\xc3\\\\xa9\\(s\\)'].dropna\\(\\).head\\(30\\).tolist\\(\\); [print\\(s\\) for s in specs]\")",
+      "Bash(python -c \"import pandas as pd; df = pd.read_excel\\('summer_internship.xlsx'\\); print\\(df.columns[6]\\); print\\(df.iloc[:, 6].head\\(20\\).tolist\\(\\)\\)\")"
+    ]
+  }
+}

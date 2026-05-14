@@ -1,7 +1,7 @@
-import React from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { Terminal, Search, FolderKanban, Heart, User } from 'lucide-react';
+import { Terminal, LayoutDashboard, Search, FolderKanban, Heart } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
+import Dashboard from './pages/Dashboard';
 import FindInternships from './pages/FindInternships';
 import MyApplications from './pages/MyApplications';
 import Favorites from './pages/Favorites';
@@ -22,6 +22,10 @@ function App() {
 
         <div className="nav-links">
           <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <LayoutDashboard size={20} />
+            Dashboard
+          </NavLink>
+          <NavLink to="/internships" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <Search size={20} />
             Find Internships
           </NavLink>
@@ -39,7 +43,8 @@ function App() {
       {/* Main Content Area */}
       <main className="main-wrapper">
         <Routes>
-          <Route path="/" element={<FindInternships />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/internships" element={<FindInternships />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/applications" element={<MyApplications />} />
         </Routes>

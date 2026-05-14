@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Minus, FileText, CheckCircle, Clock, XCircle } from 'lucide-react';
 

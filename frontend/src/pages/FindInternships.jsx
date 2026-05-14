@@ -1,27 +1,50 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Search, MapPin, Briefcase, Mail, Star, X, UploadCloud, Send, Heart, CheckSquare, Square, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { MapPin, Briefcase, Mail, X, Send, Heart, CheckSquare, Square, Check, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import FilterPanel from '../components/FilterPanel';
+import AdvancedFilterPanel from '../components/AdvancedFilterPanel';
 import InternshipCard from '../components/InternshipCard';
 import FileUploader from '../components/FileUploader';
 import BulkEmailModal from '../components/BulkEmailModal';
 
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 function FindInternships() {
   const [internships, setInternships] = useState([]);
-  const [filteredInternships, setFilteredInternships] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ locations: [], specialties: [], priorities: [] });
+  const [searching, setSearching] = useState(false);
+  const [filters, setFilters] = useState({ countries: [], cities: [], governorates: [], specialties: [], priorities: [], company_types: [] });
 
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [selectedFilters, setSelectedFilters] = useState({
-    locations: [],
+    countries: [],
+    cities: [],
+    governorates: [],
     specialties: [],
-    priorities: []
+    priorities: [],
+    company_types: []
   });
   const [sortBy, setSortBy] = useState('score');
   const [sortOrder, setSortOrder] = useState('desc');
+
+  // CV-based matching
+  const [userSkills, setUserSkills] = useState([]);
+  const [extractingSkills, setExtractingSkills] = useState(false);
+  const [cvMatchScore, setCvMatchScore] = useState(null);
 
   // Selection & Favorites
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -36,13 +59,25 @@ function FindInternships() {
   const [motFile, setMotFile] = useState(null);
   const [applying, setApplying] = useState(false);
 
+  // Fetch user profile on mount
+  useEffect(() => {
+    fetch('http://localhost:8000/api/profile')
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success' && data.data?.skills) {
+          const skills = data.data.skills.split(',').map(s => s.trim()).filter(s => s);
+          setUserSkills(skills);
+        }
+      })
+      .catch(err => console.error('Error fetching profile:', err));
+  }, []);
+
   // Fetch internships with filters
   const fetchInternships = useCallback(() => {
+    setSearching(true);
     const params = new URLSearchParams();
-    if (searchTerm) params.append('search', searchTerm);
-    if (selectedFilters.locations?.length) params.append('location', selectedFilters.locations[0]);
-    if (selectedFilters.priorities?.length) params.append('priority', selectedFilters.priorities[0]);
-    if (selectedFilters.specialties?.length) params.append('specialty', selectedFilters.specialties[0]);
+    if (debouncedSearch) params.append('search', debouncedSearch);
+    if (userSkills.length > 0) params.append('user_skills', userSkills.join(','));
     params.append('sort_by', sortBy);
     params.append('sort_order', sortOrder);
 
@@ -51,16 +86,24 @@ function FindInternships() {
       .then(data => {
         if (data.status === 'success') {
           setInternships(data.data);
-          setFilteredInternships(data.data);
           if (data.filters) setFilters(data.filters);
+          const withMatch = data.data.filter(i => i.cv_match);
+          if (withMatch.length > 0) {
+            const bestMatch = Math.max(...withMatch.map(i => i.cv_match.score));
+            setCvMatchScore(bestMatch);
+          } else {
+            setCvMatchScore(null);
+          }
         }
         setLoading(false);
+        setSearching(false);
       })
       .catch(err => {
         console.error('Error fetching data:', err);
         setLoading(false);
+        setSearching(false);
       });
-  }, [searchTerm, selectedFilters, sortBy, sortOrder]);
+  }, [debouncedSearch, sortBy, sortOrder, userSkills]);
 
   const fetchFavorites = useCallback(() => {
     fetch('http://localhost:8000/api/favorites')
@@ -74,18 +117,38 @@ function FindInternships() {
   }, []);
 
   useEffect(() => {
-    fetchInternships();
-    fetchFavorites();
+    const timer = setTimeout(() => {
+      fetchInternships();
+      fetchFavorites();
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [fetchInternships, fetchFavorites]);
 
   // Client-side filtering for multiple selections
-  useEffect(() => {
+  const filteredInternships = useMemo(() => {
     let result = internships;
 
-    if (selectedFilters.locations?.length > 0) {
+    if (selectedFilters.countries?.length > 0) {
       result = result.filter(item =>
-        selectedFilters.locations.some(loc =>
-          String(item.address || '').toLowerCase().includes(loc.toLowerCase())
+        selectedFilters.countries.some(c =>
+          String(item.country || '').toLowerCase().includes(c.toLowerCase())
+        )
+      );
+    }
+
+    if (selectedFilters.cities?.length > 0) {
+      result = result.filter(item =>
+        selectedFilters.cities.some(c =>
+          String(item.city || '').toLowerCase().includes(c.toLowerCase())
+        )
+      );
+    }
+
+    if (selectedFilters.governorates?.length > 0) {
+      result = result.filter(item =>
+        selectedFilters.governorates.some(g =>
+          String(item.governorate || '').toLowerCase().includes(g.toLowerCase())
         )
       );
     }
@@ -104,7 +167,15 @@ function FindInternships() {
       );
     }
 
-    setFilteredInternships(result);
+    if (selectedFilters.company_types?.length > 0) {
+      result = result.filter(item =>
+        selectedFilters.company_types.some(ct =>
+          String(item.company_type || '').toLowerCase().includes(ct.toLowerCase())
+        )
+      );
+    }
+
+    return result;
   }, [selectedFilters, internships]);
 
   const toggleSelection = (id) => {
@@ -129,7 +200,14 @@ function FindInternships() {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setSelectedFilters({ locations: [], specialties: [], priorities: [] });
+    setSelectedFilters({
+      countries: [],
+      cities: [],
+      governorates: [],
+      specialties: [],
+      priorities: [],
+      company_types: []
+    });
   };
 
   const toggleFavorite = async (internship) => {
@@ -148,14 +226,9 @@ function FindInternships() {
         toast.success('Added to favorites');
       }
       fetchFavorites();
-    } catch (err) {
+    } catch {
       toast.error('Failed to update favorites');
     }
-  };
-
-  const parseSpecialties = (specs) => {
-    if (!specs || typeof specs !== 'string') return [];
-    return specs.split(/[,/&-]/).map(s => s.trim()).filter(s => s.length > 0);
   };
 
   const handleApply = async (e) => {
@@ -183,7 +256,7 @@ function FindInternships() {
       } else {
         toast.error("Failed to send application.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Network error while applying.");
     } finally {
       setApplying(false);
@@ -200,6 +273,49 @@ function FindInternships() {
     return filteredInternships.filter(i => selectedIds.has(i.id));
   };
 
+  // Handle CV extraction
+  const handleExtractSkills = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setExtractingSkills(true);
+    const formData = new FormData();
+    formData.append('cv', file);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/extract-skills', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+
+      if (data.status === 'success' && data.data?.skills) {
+        setUserSkills(data.data.skills);
+        toast.success(`Found ${data.data.skills.length} skills in your CV`);
+      } else {
+        toast.error('Could not extract skills from CV');
+      }
+    } catch {
+      toast.error('Error extracting skills from CV');
+    } finally {
+      setExtractingSkills(false);
+    }
+  };
+
+  // Save user profile
+  const handleSaveProfile = async () => {
+    try {
+      await fetch('http://localhost:8000/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `skills=${encodeURIComponent(userSkills.join(','))}`
+      });
+      toast.success('Profile saved!');
+    } catch {
+      toast.error('Could not save profile');
+    }
+  };
+
   return (
     <>
       <div className="page-header">
@@ -210,7 +326,7 @@ function FindInternships() {
       </div>
 
       <div className="internships-container">
-        <FilterPanel
+        <AdvancedFilterPanel
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           filters={filters}
@@ -222,6 +338,12 @@ function FindInternships() {
           setSortOrder={setSortOrder}
           totalResults={filteredInternships.length}
           onClearFilters={clearFilters}
+          userSkills={userSkills}
+          setUserSkills={setUserSkills}
+          extractingSkills={extractingSkills}
+          onExtractSkills={handleExtractSkills}
+          onSaveProfile={handleSaveProfile}
+          cvMatchScore={cvMatchScore}
         />
 
         <div className="internships-content">
@@ -270,12 +392,17 @@ function FindInternships() {
             )}
           </AnimatePresence>
 
-          {loading ? (
+          {loading || searching ? (
             <div className="loader"></div>
           ) : (
             <>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                 Showing <strong style={{ color: 'var(--primary-color)' }}>{filteredInternships.length}</strong> opportunities
+                {userSkills.length > 0 && (
+                  <span className="cv-match-badge">
+                    <Sparkles size={14} /> CV Match: {cvMatchScore || 0}% best
+                  </span>
+                )}
               </p>
 
               <div className="internships-grid">
@@ -323,14 +450,31 @@ function FindInternships() {
 
               <h2 className="company-name" style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>{selectedInternship.company_name}</h2>
 
+              {/* CV Match Score */}
+              {selectedInternship.cv_match && (
+                <div className="cv-match-card">
+                  <Sparkles size={16} />
+                  <span>CV Match: <strong>{selectedInternship.cv_match.score}%</strong></span>
+                  {selectedInternship.cv_match.matched_skills?.length > 0 && (
+                    <span className="matched-skills">
+                      Matched: {selectedInternship.cv_match.matched_skills.join(', ')}
+                    </span>
+                  )}
+                </div>
+              )}
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
                 <div>
                   <h3 style={{ color: 'var(--primary-color)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Briefcase size={18}/> Project</h3>
                   <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{selectedInternship.subject || selectedInternship.tailored_angle || 'Not specified'}</p>
                 </div>
                 <div>
-                  <h3 style={{ color: 'var(--primary-color)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MapPin size={18}/> Details</h3>
-                  <p style={{ color: 'var(--text-secondary)' }}><strong>Address:</strong> {selectedInternship.address || 'N/A'}</p>
+                  <h3 style={{ color: 'var(--primary-color)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MapPin size={18}/> Location</h3>
+                  <p style={{ color: 'var(--text-secondary)' }}><strong>Country:</strong> {selectedInternship.country || 'N/A'}</p>
+                  <p style={{ color: 'var(--text-secondary)' }}><strong>City:</strong> {selectedInternship.city || 'N/A'}</p>
+                  {selectedInternship.governorate && (
+                    <p style={{ color: 'var(--text-secondary)' }}><strong>Governorate:</strong> {selectedInternship.governorate}</p>
+                  )}
                   <p style={{ color: 'var(--text-secondary)' }}><strong>Email:</strong> {selectedInternship.email || 'N/A'}</p>
                   <p style={{ color: 'var(--text-secondary)' }}><strong>Phone:</strong> {selectedInternship.phone || 'N/A'}</p>
                 </div>

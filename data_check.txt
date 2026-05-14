@@ -1,0 +1,48 @@
+Columns: ['ID', "Nom de l'entreprise", 'Adresse', 'Téléphone', 'Fax', 'Email entreprise', 'Spécialité(s)', 'Score', 'Priority', 'Tailored angle', 'Subject']
+
+Sample subjects:
+Application for a 2-Month Summer Internship — laboratoire CRISTAL (Centre de recherche R�seau Image SysT�me Architecture et muLtim�dia)
+Application for a 2-Month Summer Internship — mobilis
+Application for a 2-Month Summer Internship — Ovidius AI B.V.
+Application for a 2-Month Summer Internship — Helmholtz-Zentrum Hereon
+Application for a 2-Month Summer Internship — Helmholtz-Zentrum Hereon
+Application for a 2-Month Summer Internship — Helmholtz-Zentrum Hereon
+Application for a 2-Month Summer Internship — Laboratoire CNRS-IRIT(institut de recherche en informatique Toulouse)
+Application for a 2-Month Summer Internship — Conseil Audit Formation
+Application for a 2-Month Summer Internship — RHIS Software
+Application for a 2-Month Summer Internship — DISP
+Application for a 2-Month Summer Internship — Royal Military College of Canada
+Application for a 2-Month Summer Internship — BMW Group
+Application for a 2-Month Summer Internship — Banque Centrale de Tunisie (BCT)
+Application for a 2-Month Summer Internship — CodeQuest
+Application for a 2-Month Summer Internship — Vectors Software
+Application for a 2-Month Summer Internship — IMEDRA SPHERE
+Application for a 2-Month Summer Internship — FinData, LtD
+Application for a 2-Month Summer Internship — Centre d'audit et formation _ PWC
+Application for a 2-Month Summer Internship — Deloitte
+Application for a 2-Month Summer Internship — NovinoAI
+
+Sample tailored angle:
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on software development and engineering matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on software development and engineering matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on general software and information systems matches my profile and my motivation to learn in a professional engineering environment.
+Your focus on software development and engineering matches my profile and my motivation to learn in a professional engineering environment.
+
+Sample priorities:
+{'C — Medium priority': 506, 'D — Low priority': 380, 'B — High priority': 365, 'A — Top priority': 93}

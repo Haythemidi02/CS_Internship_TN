@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { X, Send, Mail, Paperclip, FileText, Check, AlertCircle, Loader } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { X, Send, Mail, Check, AlertCircle, Loader } from 'lucide-react';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 function BulkEmailModal({ selectedCompanies, onClose }) {
@@ -44,7 +44,7 @@ function BulkEmailModal({ selectedCompanies, onClose }) {
       } else {
         toast.error('Failed to send emails');
       }
-    } catch (err) {
+    } catch {
       toast.error('Network error');
     } finally {
       setSending(false);

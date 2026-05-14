@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Heart, Trash2, Mail, Search, MapPin, Star, Send, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Heart, Trash2, Mail, Search, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import FileUploader from '../components/FileUploader';
@@ -44,7 +44,7 @@ function Favorites() {
       await fetch(`http://localhost:8000/api/favorites/${internshipId}`, { method: 'DELETE' });
       toast.success('Removed from favorites');
       fetchFavorites();
-    } catch (err) {
+    } catch {
       toast.error('Failed to remove');
     }
   };
@@ -83,7 +83,7 @@ function Favorites() {
       } else {
         toast.error("Failed to send application.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Network error while applying.");
     } finally {
       setApplying(false);

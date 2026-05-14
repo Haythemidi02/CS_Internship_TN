@@ -1,6 +1,4 @@
-import React from 'react';
-import { Search, Star, MapPin, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Star, MapPin, SlidersHorizontal, X } from 'lucide-react';
 
 function FilterPanel({
   searchTerm,
@@ -83,7 +81,7 @@ function FilterPanel({
             onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
             title={sortOrder === 'desc' ? 'Descending' : 'Ascending'}
           >
-            {sortOrder === 'desc' ? '↓' : '↑'}
+            {sortOrder === 'desc' ? 'Desc' : 'Asc'}
           </button>
         </div>
       </div>
