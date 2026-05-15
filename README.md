@@ -1,138 +1,168 @@
-# CS Internship Finder
+# ENSI Summer Internship Portal
 
-A full-stack web application for discovering and managing internship opportunities.
-
-## Project Overview
-
-CS Internship Finder is a platform that connects students with internship opportunities. The application provides features for browsing internships, submitting applications, and managing your internship portfolio.
-
-## Project Structure
-
-```
-CS_Internship_TN/
-├── backend/
-│   ├── main.py
-│   └── uploads/
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   ├── pages/
-│   │   │   ├── FindInternships.jsx
-│   │   │   └── MyApplications.jsx
-│   │   └── assets/
-│   ├── public/
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── eslint.config.js
-│   └── README.md
-└── README.md
-```
-
-## Tech Stack
-
-### Backend
-- **Python** - Backend server
-- Framework and dependencies managed in `main.py`
-
-### Frontend
-- **React** - UI library
-- **Vite** - Build tool and development server
-- **ESLint** - Code linting
-
-## Getting Started
-
-### Prerequisites
-- Python 3.x
-- Node.js and npm
-
-### Backend Setup
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Install Python dependencies (ensure you have a virtual environment):
-   ```bash
-   # Create a virtual environment (optional but recommended)
-   python -m venv venv
-   
-   # Activate virtual environment
-   # On Windows:
-   venv\Scripts\activate
-   # On macOS/Linux:
-   source venv/bin/activate
-   ```
-
-3. Install required packages and start the server:
-   ```bash
-   python main.py
-   ```
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-4. The frontend will typically be available at `http://localhost:5173` (Vite default)
+A full-stack web application for searching, filtering, saving, and tracking summer internship opportunities. The backend reads internship data from `summer_internship.xlsx`, enriches it with parsed location and company metadata, and exposes a FastAPI API consumed by a React dashboard.
 
 ## Features
 
-- **Find Internships**: Browse and search available internship opportunities
-- **My Applications**: Track and manage your internship applications
-- **File Uploads**: Submit documents and portfolios
+- Dashboard with internship, application, and favorite counts
+- Internship search by company, subject, specialty, location, and keywords
+- Advanced filters for country, city, governorate, specialty, priority, and company type
+- CV skill extraction and skill-based internship matching
+- Favorites management
+- Application tracking with CV and motivation letter uploads
+- Bulk email preparation for selected companies
 
-## Development
+## Tech Stack
 
-### Running Both Backend and Frontend
+Backend:
+- Python
+- FastAPI
+- Uvicorn
+- Pandas
+- SQLite
 
-To run the full application:
+Frontend:
+- React
+- Vite
+- React Router
+- Tailwind CSS
+- Framer Motion
+- Lucide React icons
 
-1. **Terminal 1 - Backend:**
-   ```bash
-   cd backend
-   python main.py
-   ```
+## Project Structure
 
-2. **Terminal 2 - Frontend:**
-   ```bash
-   cd frontend
-   npm run dev
-   ```
+```text
+CS_Internship_TN/
+|-- backend/
+|   |-- main.py
+|   |-- applications.db
+|   `-- uploads/
+|-- frontend/
+|   |-- public/
+|   |-- src/
+|   |   |-- components/
+|   |   |-- pages/
+|   |   |-- App.jsx
+|   |   `-- main.jsx
+|   |-- package.json
+|   `-- vite.config.js
+|-- summer_internship.xlsx
+|-- data_check.txt
+`-- README.md
+```
 
-### Linting
+## Prerequisites
 
-To check code quality in the frontend:
+- Python 3.10 or newer
+- Node.js and npm
+
+## Backend Setup
+
+From the project root:
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install fastapi uvicorn pandas openpyxl python-multipart pydantic
+```
+
+Optional packages for CV text extraction:
+
+```bash
+pip install PyPDF2 python-docx
+```
+
+Start the API:
+
+```bash
+python main.py
+```
+
+The backend runs at:
+
+```text
+http://localhost:8000
+```
+
+Interactive API documentation is available at:
+
+```text
+http://localhost:8000/docs
+```
+
+## Frontend Setup
+
+Open a second terminal from the project root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend runs at:
+
+```text
+http://localhost:5173
+```
+
+The frontend currently calls the backend directly at `http://localhost:8000`, so keep the backend running while using the app.
+
+## Data And Storage
+
+- `summer_internship.xlsx` is the source dataset for internship listings.
+- `backend/applications.db` stores applications, favorites, and the user profile.
+- `backend/uploads/` stores uploaded CV and motivation letter files.
+
+The Excel file is expected to include these columns:
+
+- `ID`
+- `Nom de l'entreprise`
+- `Adresse`
+- `Telephone`
+- `Fax`
+- `Email entreprise`
+- `Specialite(s)`
+- `Score`
+- `Priority`
+- `Tailored angle`
+- `Subject`
+
+## API Endpoints
+
+- `GET /api/internships` - list, search, filter, sort, and enrich internships
+- `GET /api/search-suggestions` - return search suggestions
+- `GET /api/profile` - get saved user profile
+- `POST /api/profile` - save user skills and preferences
+- `POST /api/extract-skills` - extract skills from an uploaded CV
+- `GET /api/favorites` - list favorites
+- `POST /api/favorites` - add or replace a favorite
+- `DELETE /api/favorites/{internship_id}` - remove a favorite
+- `GET /api/applications` - list applications
+- `POST /api/applications` - submit an application
+- `PUT /api/applications/{app_id}` - update application status or notes
+- `DELETE /api/applications/{app_id}` - delete an application
+- `POST /api/send-bulk-email` - simulate bulk email preparation
+
+## Development Commands
+
+Frontend linting:
+
 ```bash
 cd frontend
 npm run lint
 ```
 
-## API Integration
+Frontend production build:
 
-The frontend communicates with the backend API. Ensure the backend server is running before starting the frontend development server.
+```bash
+cd frontend
+npm run build
+```
 
-## Contributing
+## Notes
 
-1. Create a feature branch for your changes
-2. Make your commits with clear messages
-3. Run linting checks before submitting code
-4. Submit a pull request with a description of your changes
-
-## File Upload
-
-The `uploads/` directory in the backend stores uploaded files. Ensure proper permissions are set for this directory.
-
+- CORS is currently open in the FastAPI app for local development.
+- Bulk email sending is simulated by the API; it does not send real emails.
+- Uploaded documents and the SQLite database are local development artifacts and should not be committed if they contain personal data.
