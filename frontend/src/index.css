@@ -24,8 +24,9 @@ body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-primary);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   background-image: radial-gradient(circle at 15% 50%, rgba(69, 162, 158, 0.15), transparent 25%),
                     radial-gradient(circle at 85% 30%, rgba(102, 252, 241, 0.1), transparent 25%);
 }
@@ -42,7 +43,9 @@ body {
 /* App Layout */
 .app-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 /* Sidebar */
@@ -53,10 +56,10 @@ body {
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
+  flex-shrink: 0;
   height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
   z-index: 50;
   transition: transform 0.3s ease;
 }
@@ -117,9 +120,12 @@ body {
 /* Main Content Area */
 .main-wrapper {
   flex: 1;
-  margin-left: 280px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  height: 100vh;
+  height: 100dvh;
 }
 
 .page-header {
