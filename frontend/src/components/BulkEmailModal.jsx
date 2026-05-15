@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Send, Mail, Check, AlertCircle, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { apiFetch } from '../api';
 
 function BulkEmailModal({ selectedCompanies, onClose }) {
   const [subject, setSubject] = useState('');
@@ -24,7 +25,7 @@ function BulkEmailModal({ selectedCompanies, onClose }) {
     setSending(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/send-bulk-email', {
+      const response = await apiFetch('/api/send-bulk-email', {
         method: 'POST',
         body: JSON.stringify({
           recipients: companiesWithEmail.map(c => ({

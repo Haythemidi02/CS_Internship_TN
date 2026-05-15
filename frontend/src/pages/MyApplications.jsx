@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Trash2, FileText, CheckCircle, Clock, XCircle, Filter, Search, Edit2, Save, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ApplicationStats } from '../components/StatsCard';
+import { apiFetch } from '../api';
 
 function MyApplications() {
   const [applications, setApplications] = useState([]);
@@ -13,7 +14,7 @@ function MyApplications() {
   const [editStatus, setEditStatus] = useState('');
 
   const fetchApplications = () => {
-    fetch('http://localhost:8000/api/applications')
+    apiFetch('/api/applications')
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
@@ -35,7 +36,7 @@ function MyApplications() {
     if (!window.confirm("Are you sure you want to remove this application record?")) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/applications/${id}`, {
+      const response = await apiFetch(`/api/applications/${id}`, {
         method: 'DELETE',
       });
       const data = await response.json();
@@ -52,7 +53,7 @@ function MyApplications() {
 
   const handleUpdateStatus = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/applications/${id}`, {
+      const response = await apiFetch(`/api/applications/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `status=${editStatus}&notes=${encodeURIComponent(editNotes)}`

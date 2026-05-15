@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Briefcase, Heart, FileText, MapPin, Star, TrendingUp, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { apiFetch } from '../api';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -17,9 +18,9 @@ function Dashboard() {
 
   useEffect(() => {
     Promise.all([
-      fetch('http://localhost:8000/api/internships').then(res => res.json()),
-      fetch('http://localhost:8000/api/applications').then(res => res.json()),
-      fetch('http://localhost:8000/api/favorites').then(res => res.json())
+      apiFetch('/api/internships').then(res => res.json()),
+      apiFetch('/api/applications').then(res => res.json()),
+      apiFetch('/api/favorites').then(res => res.json())
     ])
       .then(([internshipsRes, applicationsRes, favoritesRes]) => {
         const internships = internshipsRes.data || [];

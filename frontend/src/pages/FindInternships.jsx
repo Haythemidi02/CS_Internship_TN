@@ -6,6 +6,7 @@ import AdvancedFilterPanel from '../components/AdvancedFilterPanel';
 import InternshipCard from '../components/InternshipCard';
 import FileUploader from '../components/FileUploader';
 import BulkEmailModal from '../components/BulkEmailModal';
+import { apiFetch } from '../api';
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -61,7 +62,7 @@ function FindInternships() {
 
   // Fetch user profile on mount
   useEffect(() => {
-    fetch('http://localhost:8000/api/profile')
+    apiFetch('/api/profile')
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success' && data.data?.skills) {
@@ -81,7 +82,7 @@ function FindInternships() {
     params.append('sort_by', sortBy);
     params.append('sort_order', sortOrder);
 
-    fetch(`http://localhost:8000/api/internships?${params}`)
+    apiFetch(`/api/internships?${params}`)
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
@@ -106,7 +107,7 @@ function FindInternships() {
   }, [debouncedSearch, sortBy, sortOrder, userSkills]);
 
   const fetchFavorites = useCallback(() => {
-    fetch('http://localhost:8000/api/favorites')
+    apiFetch('/api/favorites')
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
@@ -215,10 +216,10 @@ function FindInternships() {
 
     try {
       if (isFav) {
-        await fetch(`http://localhost:8000/api/favorites/${internship.id}`, { method: 'DELETE' });
+        await apiFetch(`/api/favorites/${internship.id}`, { method: 'DELETE' });
         toast.success('Removed from favorites');
       } else {
-        await fetch('http://localhost:8000/api/favorites', {
+        await apiFetch('/api/favorites', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: `internship_id=${internship.id}&company_name=${encodeURIComponent(internship.company_name)}&email=${encodeURIComponent(internship.email || '')}&specialties=${encodeURIComponent(internship.specialties || '')}`
@@ -242,7 +243,7 @@ function FindInternships() {
     if (motFile) formData.append('motivation', motFile);
 
     try {
-      const response = await fetch('http://localhost:8000/api/applications', {
+      const response = await apiFetch('/api/applications', {
         method: 'POST',
         body: formData,
       });
@@ -283,7 +284,7 @@ function FindInternships() {
     formData.append('cv', file);
 
     try {
-      const response = await fetch('http://localhost:8000/api/extract-skills', {
+      const response = await apiFetch('/api/extract-skills', {
         method: 'POST',
         body: formData
       });
@@ -305,7 +306,7 @@ function FindInternships() {
   // Save user profile
   const handleSaveProfile = async () => {
     try {
-      await fetch('http://localhost:8000/api/profile', {
+      await apiFetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `skills=${encodeURIComponent(userSkills.join(','))}`

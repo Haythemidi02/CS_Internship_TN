@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import FileUploader from '../components/FileUploader';
 import BulkEmailModal from '../components/BulkEmailModal';
+import { apiFetch } from '../api';
 
 function Favorites() {
   const [favorites, setFavorites] = useState([]);
@@ -19,7 +20,7 @@ function Favorites() {
   const [applying, setApplying] = useState(false);
 
   const fetchFavorites = () => {
-    fetch('http://localhost:8000/api/favorites')
+    apiFetch('/api/favorites')
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
@@ -41,7 +42,7 @@ function Favorites() {
     if (!window.confirm('Remove this company from favorites?')) return;
 
     try {
-      await fetch(`http://localhost:8000/api/favorites/${internshipId}`, { method: 'DELETE' });
+      await apiFetch(`/api/favorites/${internshipId}`, { method: 'DELETE' });
       toast.success('Removed from favorites');
       fetchFavorites();
     } catch {
@@ -69,7 +70,7 @@ function Favorites() {
     if (motFile) formData.append('motivation', motFile);
 
     try {
-      const response = await fetch('http://localhost:8000/api/applications', {
+      const response = await apiFetch('/api/applications', {
         method: 'POST',
         body: formData,
       });
